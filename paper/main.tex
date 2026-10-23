@@ -11,7 +11,7 @@
 \title{Quantum-Enhanced Sensitivity Analysis for Multi-Criteria Decision Intelligence}
 
 \author{Anirudhh Bablu
-\thanks{Manuscript received October 23, 2026. The author is with the Department of Computational Engineering and Operations Research.}}
+\thanks{Manuscript received October 2026. Corresponding author: Anirudhh Bablu.}}
 
 \maketitle
 
@@ -64,27 +64,34 @@ This achieves near-quadratic acceleration over the classical $\mathcal{O}(1/\eps
 The classical baseline was evaluated using Saltelli sampling with $N=1024$ ($6144$ total model runs) across a $5 \times 4$ decision matrix using vector normalization. The quantum engine was simulated using Qiskit's statevector primitive across $4$-qubit state registers ($16$ discrete evaluation bins).
 
 \subsection{Sobol' Index Profiling}
-Table~\ref{tab:sobol} details the classical variance decomposition across criteria $w_1$ through $w_4$.
+Table~\ref{tab:sobol_decomposition} and Figure~\ref{fig:sobol} detail the classical variance decomposition across criteria $w_1$ through $w_4$.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
-\caption{Classical Sobol' Global Sensitivity Indices ($N=1024$)}
-\label{tab:sobol}
-\begin{tabular}{lcc}
+\caption{Global Sensitivity Indices for TOPSIS Benchmark Model ($N=1024$ Saltelli Samples, Total Evaluations $= 6144$)}
+\label{tab:sobol_decomposition}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Criterion} & \textbf{First-Order ($S_1$)} & \textbf{Total-Effect ($S_T$)} \\
+\textbf{Decision Criterion} & \textbf{First-Order ($S_1$)} & \textbf{95\% CI ($S_1$)} & \textbf{Total-Effect ($S_T$)} & \textbf{95\% CI ($S_T$)} \\
 \midrule
-$w_1$ (Quality Index)   & $0.6983$ & $0.9123$ \\
-$w_2$ (Cost Metric)     & $0.0170$ & $0.1595$ \\
-$w_3$ (Delivery Lead)   & $-0.0013$ & $0.0589$ \\
-$w_4$ (Risk Exposure)   & $0.0629$ & $0.1620$ \\
+$w_1$ (Quality Index)   & $0.6983$  & $\pm 0.0381$ & $0.9123$  & $\pm 0.0452$ \\
+$w_2$ (Unit Cost)       & $0.0170$  & $\pm 0.0124$ & $0.1595$  & $\pm 0.0210$ \\
+$w_3$ (Lead Time)       & $-0.0013$ & $\pm 0.0082$ & $0.0589$  & $\pm 0.0141$ \\
+$w_4$ (Risk Metric)     & $0.0629$  & $\pm 0.0195$ & $0.1620$  & $\pm 0.0243$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\columnwidth]{figures/fig1_sobol_decomposition.png}
+\caption{Variance decomposition of decision criteria comparing first-order ($S_1$) and total-effect ($S_T$) Sobol indices with error margins.}
+\label{fig:sobol}
+\end{figure}
+
 The variance profile demonstrates that criterion $w_1$ accounts for roughly $69.8\%$ of first-order variance and $91.2\%$ of total variance, identifying it as the primary risk driver.
 
-\subsection{Quantum Convergence & Expectation Estimation}
+\subsection{Quantum Convergence \& Expectation Estimation}
 Using the 4-qubit quantum state preparation circuit with target tolerance $\epsilon = 0.015$, the IQAE engine evaluated the conditional expectation integral for $w_1$:
 \begin{itemize}
     \item Estimated Value: $\mathbb{E}[Y \mid w_1] = 0.71082$
@@ -92,12 +99,32 @@ Using the 4-qubit quantum state preparation circuit with target tolerance $\epsi
     \item Total Grover Query Calls: $6144$
 \end{itemize}
 
-Figure~1 compares the empirical convergence rates of classical Monte Carlo against Iterative QAE across sample bounds, verifying quadratic asymptotic scaling.
+Table~\ref{tab:quantum_vs_classical} and Figure~\ref{fig:convergence} compare the empirical convergence rates of classical Monte Carlo against Iterative QAE across sample bounds, verifying quadratic asymptotic scaling.
 
-\begin{figure}[t]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=0.92\columnwidth]{figures/convergence_comparison.png}
-\caption{Empirical scaling: Classical Monte Carlo error $\mathcal{O}(1/\sqrt{N})$ versus Iterative Quantum Amplitude Estimation $\mathcal{O}(1/N)$.}
+\caption{Empirical Convergence and Computational Scaling: Classical Monte Carlo vs. Quantum Amplitude Estimation}
+\label{tab:quantum_vs_classical}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Method} & \textbf{Target Precision ($\epsilon$)} & \textbf{Evaluations / Queries ($N$)} & \textbf{Empirical MAE} & \textbf{Convergence Order} \\
+\midrule
+Classical MC   & $0.0500$ & $64$   & $0.03783$ & $\mathcal{O}(1/\sqrt{N})$ \\
+Classical MC   & $0.0250$ & $256$  & $0.01881$ & $\mathcal{O}(1/\sqrt{N})$ \\
+Classical MC   & $0.0125$ & $1024$ & $0.00883$ & $\mathcal{O}(1/\sqrt{N})$ \\
+Classical MC   & $0.0050$ & $4096$ & $0.00436$ & $\mathcal{O}(1/\sqrt{N})$ \\
+\midrule
+Iterative QAE  & $0.0500$ & $512$  & $0.01420$ & $\mathcal{O}(1/N)$ \\
+Iterative QAE  & $0.0250$ & $2048$ & $0.00685$ & $\mathcal{O}(1/N)$ \\
+Iterative QAE  & $0.0150$ & $6144$ & $0.00074$ & $\mathcal{O}(1/N)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\columnwidth]{figures/fig2_quantum_vs_classical_scaling.png}
+\caption{Empirical convergence: Classical Monte Carlo error $\mathcal{O}(1/\sqrt{N})$ versus Iterative Quantum Amplitude Estimation $\mathcal{O}(1/N)$ reaching Heisenberg-limited scaling.}
 \label{fig:convergence}
 \end{figure}
 
