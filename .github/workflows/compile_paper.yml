@@ -1,0 +1,25 @@
+name: Build IEEE Manuscript PDF
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX Document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          working_directory: paper
+
+      - name: Upload Compiled PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quantum_MCDM_Paper_PDF
+          path: paper/main.pdf
